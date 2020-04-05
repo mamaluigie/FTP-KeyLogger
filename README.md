@@ -11,10 +11,10 @@ thinsg that it will do:
   - a new folder will be created that will have the captured text file in a folder and the videos in another folder.
   - in the text file there will be multiple folders for every time the program is run. the names of the folders 
     will be the time and date of when the person started the program on their computer.
- 3. Send 30 second video files back to the ftp server.
-    - in the videos folder each 30 second video that is created will be sent after recording for 30 seconds and deleted. 
-    - the videos will be stored in a random location deep in the other persons computer for each time the compter sends 
-      and deletes a screenshot.
+3. Send 30 second video files back to the ftp server.
+  - in the videos folder each 30 second video that is created will be sent after recording for 30 seconds and deleted. 
+  - the videos will be stored in a random location deep in the other persons computer for each time the compter sends 
+    and deletes a screenshot.
  4. Each task will be run on a concurrent process. I am going to try to implement multiprocessing into this program.
     (either do this or have multiple python programs running and doing the same thing.)
  5. Have the program be reexecuted when it is stopped from being in  a running state.(maybe)
