@@ -1,4 +1,4 @@
-# FTP-KeyLogger
+# FTP-KeyLogger (Unfinished)
 This is a project that I have started that will send information back to a central ftp server.
 
 This will require for you to have two computers to set up.
