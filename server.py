@@ -39,7 +39,7 @@ handler = FTPHandler
 handler.authorizer = authorizer
 
 # Define a customized banner (string returned when client connects)
-handler.banner = "pyftpdlib based ftpd ready."
+handler.banner = "pyftpdlib based ftpd ready.\nConnected!"
 
 # Specify a masquerade address and the range of ports to use for
 # passive connections.  Decomment in case you're behind a NAT.
@@ -59,4 +59,3 @@ logging.basicConfig(filename='/var/log/pyftpd.log', level=logging.INFO)
 
 # start ftp server
 server.serve_forever()
-
