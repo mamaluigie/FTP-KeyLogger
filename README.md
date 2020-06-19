@@ -19,5 +19,6 @@ thinsg that it will do:
   - the videos will be stored in a random location deep in the other persons computer for each time the compter sends 
     and deletes a screenshot.
  4. Each task will be run on a concurrent process. I am going to try to implement multiprocessing into this program.
+    
     (either do this or have multiple python programs running and doing the same thing and have one python program execute all of the rest from the beginning...)
  5. Have the program be reexecuted when it is stopped from being in a running state.
