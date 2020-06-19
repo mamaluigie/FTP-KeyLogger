@@ -22,3 +22,8 @@ thinsg that it will do:
     
     (either do this or have multiple python programs running and doing the same thing and have one python program execute all of the rest from the beginning...)
  5. Have the program be reexecuted when it is stopped from being in a running state.
+
+rescources 
+
+https://realpython.com/intro-to-python-threading/
+https://www.tutorialspoint.com/python/python_multithreading.htm
