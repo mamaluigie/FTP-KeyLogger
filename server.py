@@ -23,39 +23,43 @@ class DummyMD5Authorizer(DummyAuthorizer):
         except KeyError:
             raise AuthenticationFailed
 
+try:
+    # Generating a hash of the password
+    hash = md5('9lGi^W0rjlJ5Ve'.encode('utf-8')).hexdigest()
 
-# Generating a hash of the password
-hash = md5('9lGi^W0rjlJ5Ve').hexdigest()
+    # Instantiate an md5 dummy authorizer for managing 'virtual' users
+    authorizer = DummyMD5Authorizer()
 
-# Instantiate an md5 dummy authorizer for managing 'virtual' users
-authorizer = DummyMD5Authorizer()
+    # Define a new user having only write and make directory permissions
+    # adding a user that can only make a directory and write to the directories that it creates
+    authorizer.add_user("logger", hash, str(os.getcwd()), perm="mw")
 
-# Define a new user having only write and make directory permissions
-# adding a user that can only make a directory and write to the directories that it creates
-authorizer.add_user("logger", hash, str(os.getcwd()), perm="mw")
+    # Instantiate FTP handler class
+    handler = FTPHandler
+    handler.authorizer = authorizer
 
-# Instantiate FTP handler class
-handler = FTPHandler
-handler.authorizer = authorizer
+    # Define a customized banner (string returned when client connects)
+    handler.banner = "pyftpdlib based ftpd ready.\nConnected!"
 
-# Define a customized banner (string returned when client connects)
-handler.banner = "pyftpdlib based ftpd ready.\nConnected!"
+    # Specify a masquerade address and the range of ports to use for
+    # passive connections.  Decomment in case you're behind a NAT.
+    #handler.masquerade_address = '151.25.42.11'
+    #handler.passive_ports = range(60000, 65535)
 
-# Specify a masquerade address and the range of ports to use for
-# passive connections.  Decomment in case you're behind a NAT.
-#handler.masquerade_address = '151.25.42.11'
-#handler.passive_ports = range(60000, 65535)
+    # Instantiate FTP server class and listen on 0.0.0.0:2121
+    address = ('', 2121)
+    server = FTPServer(address, handler)
 
-# Instantiate FTP server class and listen on 0.0.0.0:2121
-address = ('', 2121)
-server = FTPServer(address, handler)
+    # set a limit for connections
+    server.max_cons = 10
+    server.max_cons_per_ip = 1
 
-# set a limit for connections
-server.max_cons = 256
-server.max_cons_per_ip = 5
+    # adding a logging location for all logs to be stored
+    logging.basicConfig(filename='/var/log/pyftpd.log', level=logging.INFO)
 
-# adding a logging location for all logs to be stored
-logging.basicConfig(filename='/var/log/pyftpd.log', level=logging.INFO)
+    print('FTP Server Started\n\n')
 
-# start ftp server
-server.serve_forever()
+    # start ftp server
+    server.serve_forever()
+except:
+    print('server is closed now...')
