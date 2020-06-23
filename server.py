@@ -4,7 +4,6 @@
 
 import socket
 import os
-import glob
 import threading
 from time import sleep
 from math import ceil
