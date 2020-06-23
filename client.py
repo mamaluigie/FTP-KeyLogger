@@ -7,7 +7,6 @@ import pyautogui
 import time
 import keyboard
 import getpass
-from ftplib import FTP
 from crontab import CronTab
 
 class listener():
