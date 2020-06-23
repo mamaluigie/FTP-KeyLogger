@@ -1,4 +1,4 @@
-# FTP-KeyLogger (Unfinished)
+# FTP-KeyLogger
 This is a project that I have started that will send information back to a central ftp server that is built upon the socket library in python.
 
 This will require for you to have two computers to set up.
