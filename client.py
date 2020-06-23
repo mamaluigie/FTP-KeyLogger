@@ -187,6 +187,4 @@ try:
         log_keys_thread.start()
 except:
     #in the except all of the information will be sent from the folders before doinng the sys.exit
-    
-    
     sys.exit(1)
