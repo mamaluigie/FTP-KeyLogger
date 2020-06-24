@@ -16,8 +16,6 @@ def logged_text():
 
     print("waiting for a connection from logged_text_socket")
     logged_text_socket.listen()
-
-    print("waiting for a connection from logged_text_socket")
     
     conn, addr = logged_text_socket.accept()
     print(addr, "Has connected to the server. (incomming ip, from this port)")
